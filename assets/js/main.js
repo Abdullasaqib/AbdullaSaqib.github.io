@@ -10,19 +10,16 @@
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   if (!location.hash) window.scrollTo(0, 0);
 
-  // Load Drive videos only when the showreel is near the viewport
-  var reelFrames = document.querySelectorAll("iframe[data-src]");
-  var reelSection = document.getElementById("showreel");
-  if (reelSection && "IntersectionObserver" in window) {
-    var reelObs = new IntersectionObserver(function (entries) {
-      if (!entries[0].isIntersecting) return;
-      reelFrames.forEach(function (f) { f.src = f.dataset.src; });
-      reelObs.disconnect();
-    }, { rootMargin: "600px 0px" });
-    reelObs.observe(reelSection);
-  } else {
-    reelFrames.forEach(function (f) { f.src = f.dataset.src; });
-  }
+  // Showreel: light poster first, the heavy Drive player loads only on click
+  document.querySelectorAll(".reel__poster").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var frame = document.createElement("iframe");
+      frame.src = "https://drive.google.com/file/d/" + btn.dataset.id + "/preview";
+      frame.allow = "autoplay; fullscreen";
+      frame.title = btn.getAttribute("aria-label");
+      btn.replaceWith(frame);
+    });
+  });
 
   // Marquees: duplicate each track so the loop is seamless
   document.querySelectorAll(".marquee").forEach(function (m) {
@@ -38,24 +35,16 @@
       el.textContent = el.dataset.count + (el.dataset.suffix || "");
     });
     initSwipers();
-    initNav(null);
+    initNav();
     return;
   }
 
   gsap.registerPlugin(ScrollTrigger);
+  // Native scrolling; avoid re-layout jumps when mobile address bars show/hide
+  ScrollTrigger.config({ ignoreMobileResize: true });
   document.body.classList.add("is-loading");
 
-  // Smooth scroll (Lenis)
-  var lenis = null;
-  if (typeof window.Lenis !== "undefined") {
-    lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
-    lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
-    gsap.ticker.lagSmoothing(0);
-    lenis.stop();
-  }
-
-  initNav(lenis);
+  initNav();
   initCursor();
   initSwipers();
   initTilt();
@@ -85,7 +74,6 @@
     initNeural();
     initOrb();
     document.body.classList.remove("is-loading");
-    if (lenis) lenis.start();
 
     var tl = gsap.timeline();
     tl.from(".hero__title .line-in", { yPercent: 110, rotate: 4, stagger: 0.15, duration: 1.1, ease: "power4.out" })
@@ -165,7 +153,7 @@
         ease: "none",
         scrollTrigger: {
           trigger: ".build__pin", start: "center center", end: function () { return "+=" + dist(); },
-          pin: true, scrub: 1, invalidateOnRefresh: true
+          pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true
         }
       });
     });
@@ -182,16 +170,10 @@
       gsap.from(d, { scale: 0, duration: 0.5, ease: "back.out(3)", scrollTrigger: { trigger: d, start: "top 80%" } });
     });
 
-    // Marquee strip skews with scroll velocity
-    var skewTo = gsap.quickTo(".marquee-wrap .marquee__track", "skewX", { duration: 0.4, ease: "power3" });
-    ScrollTrigger.create({
-      onUpdate: function (self) { skewTo(gsap.utils.clamp(-12, 12, self.getVelocity() / -250)); }
-    });
-
     ScrollTrigger.refresh();
   }
 
-  function initNav(lenis) {
+  function initNav() {
     var nav = document.getElementById("nav");
     var burger = document.getElementById("burger");
     burger.addEventListener("click", function () { nav.classList.toggle("is-open"); });
@@ -203,16 +185,24 @@
         if (!target) return;
         e.preventDefault();
         nav.classList.remove("is-open");
-        if (lenis) lenis.scrollTo(target, { offset: id === "#top" ? 0 : -80, duration: 1.4 });
-        else target.scrollIntoView({ behavior: "smooth" });
+        var top = id === "#top" ? 0 : target.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: top, behavior: reduceMotion ? "auto" : "smooth" });
       });
     });
 
-    var last = 0;
+    // Hide nav on scroll down, show on scroll up (ignores tiny jitters)
+    var last = window.scrollY, ticking = false;
     window.addEventListener("scroll", function () {
-      var y = window.scrollY;
-      nav.classList.toggle("is-hidden", y > last && y > 300 && !nav.classList.contains("is-open"));
-      last = y;
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        var y = window.scrollY;
+        if (Math.abs(y - last) > 8) {
+          nav.classList.toggle("is-hidden", y > last && y > 300 && !nav.classList.contains("is-open"));
+          last = y;
+        }
+        ticking = false;
+      });
     }, { passive: true });
   }
 
@@ -266,7 +256,7 @@
       slidesPerView: "auto",
       initialSlide: 1,
       grabCursor: true,
-      coverflowEffect: { rotate: 18, stretch: 0, depth: 220, modifier: 1, slideShadows: true },
+      coverflowEffect: { rotate: 18, stretch: 0, depth: 220, modifier: 1, slideShadows: false },
       pagination: { el: ".reel-pagination", clickable: true }
     });
   }
@@ -276,7 +266,7 @@
     var canvas = document.getElementById("orb");
     if (!canvas) return;
     var ctx = canvas.getContext("2d");
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     var size, R, pts = [], links = [];
     var N = 140;
     var rotX = 0.3, rotY = 0, targetX = 0.3, targetY = 0, spin = 0.0035;
@@ -359,7 +349,8 @@
     var canvas = document.getElementById("neural");
     if (!canvas) return;
     var ctx = canvas.getContext("2d");
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Full-screen canvas: 1x is plenty for thin lines and much cheaper per frame
+    var dpr = 1;
     var w, h, nodes = [];
     var mouse = { x: -9999, y: -9999 };
     var visible = true;

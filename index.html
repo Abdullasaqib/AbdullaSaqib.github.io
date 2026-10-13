@@ -14,7 +14,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.13/dist/lenis.css">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -30,7 +29,6 @@
 
   <div class="cursor" id="cursor" aria-hidden="true"></div>
   <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
-  <div class="noise" aria-hidden="true"></div>
 
   <!-- Nav -->
   <header class="nav" id="nav">
@@ -377,19 +375,19 @@
         <div class="swiper-wrapper">
           <div class="swiper-slide reel">
             <div class="reel__frame">
-              <iframe data-src="https://drive.google.com/file/d/1LVETZKRYbVj1YQ0IpGQ_oEDXbP8KtJny/preview" allow="autoplay; fullscreen" title="AI video sample 1"></iframe>
+              <button class="reel__poster" data-id="1LVETZKRYbVj1YQ0IpGQ_oEDXbP8KtJny" aria-label="Play AI UGC product review" style="background-image:url('https://drive.google.com/thumbnail?id=1LVETZKRYbVj1YQ0IpGQ_oEDXbP8KtJny&amp;sz=w720')"><span class="reel__play" aria-hidden="true"></span></button>
             </div>
             <p class="reel__caption"><span class="mono">01</span> AI UGC product review</p>
           </div>
           <div class="swiper-slide reel">
             <div class="reel__frame">
-              <iframe data-src="https://drive.google.com/file/d/1hm9CKiwaidPwHk6DaxBZi-mfQr8wHmx7/preview" allow="autoplay; fullscreen" title="AI video sample 2"></iframe>
+              <button class="reel__poster" data-id="1hm9CKiwaidPwHk6DaxBZi-mfQr8wHmx7" aria-label="Play cinematic story scene" style="background-image:url('https://drive.google.com/thumbnail?id=1hm9CKiwaidPwHk6DaxBZi-mfQr8wHmx7&amp;sz=w720')"><span class="reel__play" aria-hidden="true"></span></button>
             </div>
             <p class="reel__caption"><span class="mono">02</span> Cinematic story scene</p>
           </div>
           <div class="swiper-slide reel">
             <div class="reel__frame">
-              <iframe data-src="https://drive.google.com/file/d/1r_FMEu1W4PYc_4-Dhn5AM49Shz6og3Pl/preview" allow="autoplay; fullscreen" title="AI video sample 3"></iframe>
+              <button class="reel__poster" data-id="1r_FMEu1W4PYc_4-Dhn5AM49Shz6og3Pl" aria-label="Play courtroom drama scene" style="background-image:url('https://drive.google.com/thumbnail?id=1r_FMEu1W4PYc_4-Dhn5AM49Shz6og3Pl&amp;sz=w720')"><span class="reel__play" aria-hidden="true"></span></button>
             </div>
             <p class="reel__caption"><span class="mono">03</span> Courtroom drama scene</p>
           </div>
@@ -459,7 +457,6 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script src="https://unpkg.com/split-type@0.3.4/umd/index.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
