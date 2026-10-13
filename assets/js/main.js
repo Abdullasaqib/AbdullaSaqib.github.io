@@ -10,15 +10,20 @@
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   if (!location.hash) window.scrollTo(0, 0);
 
-  // Showreel: light poster first, the heavy Drive player loads only on click
+  // Showreel: self-hosted videos; nothing downloads until play is pressed
+  var reelVideos = document.querySelectorAll(".reel__video");
+  function pauseOthers(except) {
+    reelVideos.forEach(function (v) { if (v !== except && !v.paused) v.pause(); });
+  }
   document.querySelectorAll(".reel__poster").forEach(function (btn) {
+    var video = btn.parentElement.querySelector("video");
     btn.addEventListener("click", function () {
-      var frame = document.createElement("iframe");
-      frame.src = "https://drive.google.com/file/d/" + btn.dataset.id + "/preview";
-      frame.allow = "autoplay; fullscreen";
-      frame.title = btn.getAttribute("aria-label");
-      btn.replaceWith(frame);
+      pauseOthers(video);
+      video.controls = true;
+      btn.hidden = true;
+      video.play();
     });
+    video.addEventListener("play", function () { pauseOthers(video); });
   });
 
   // Marquees: duplicate each track so the loop is seamless
@@ -257,6 +262,8 @@
       initialSlide: 1,
       grabCursor: true,
       coverflowEffect: { rotate: 18, stretch: 0, depth: 220, modifier: 1, slideShadows: false },
+      noSwipingSelector: "video[controls]",
+      on: { slideChange: function () { pauseOthers(null); } },
       pagination: { el: ".reel-pagination", clickable: true }
     });
   }

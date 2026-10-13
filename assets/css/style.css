@@ -246,9 +246,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .reel-swiper { padding: 10px 0 60px !important; }
 .reel { width: min(360px, 78vw) !important; }
 .reel__frame { position: relative; aspect-ratio: 9 / 16; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: var(--surface); box-shadow: 0 30px 80px rgba(0, 0, 0, .5); }
-.reel__frame::before { content: "Loading video…"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
-.reel__frame iframe { position: relative; width: 100%; height: 100%; border: 0; }
-.reel__poster { position: relative; display: block; width: 100%; height: 100%; background-color: var(--surface); background-size: cover; background-position: center; cursor: pointer; }
+.reel-swiper .swiper-wrapper { align-items: center; }
+.reel--square { width: min(440px, 86vw) !important; }
+.reel--square .reel__frame { aspect-ratio: 1; }
+.reel__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }
+.reel__poster { position: absolute; inset: 0; display: block; width: 100%; height: 100%; cursor: pointer; }
+.reel__poster[hidden] { display: none; }
 .reel__poster::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(5, 7, 13, .65), transparent 45%); }
 .reel__play { position: absolute; z-index: 1; top: 50%; left: 50%; width: 72px; height: 72px; margin: -36px 0 0 -36px; border-radius: 50%; background: var(--grad); box-shadow: 0 0 40px rgba(139, 92, 246, .55); transition: transform .3s; }
 .reel__play::before { content: ""; position: absolute; top: 50%; left: 50%; margin: -11px 0 0 -6px; border-style: solid; border-width: 11px 0 11px 18px; border-color: transparent transparent transparent #05070d; }
